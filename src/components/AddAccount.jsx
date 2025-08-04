@@ -15,7 +15,7 @@ import {
 import { getUUID } from '../utils/uuid';
 import { save, load } from '../utils/storage';
 
-const AddModal = ({ countRef }) => {
+const AddModal = ({ countRef, refreshData }) => {
   const [visible, setVisible] = useState(false);
   const [id, setId] = useState('');
   const [type, setType] = useState('游戏');
@@ -55,6 +55,7 @@ const AddModal = ({ countRef }) => {
     setAccount('');
     setPassword('');
     hide();
+    refreshData();
   };
 
   const renderTitle = () => {

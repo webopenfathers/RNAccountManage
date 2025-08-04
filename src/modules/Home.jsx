@@ -42,6 +42,7 @@ function Home() {
   useEffect(() => {
     getData();
   }, []);
+
   const onClick = () => {
     countRef.current?.show();
   };
@@ -51,7 +52,7 @@ function Home() {
       <HomeTitle />
       <SectionListCpn sectionData={sectionData} />
       <AddButton onClick={onClick} />
-      <AddAccount countRef={countRef} />
+      <AddAccount countRef={countRef} refreshData={() => getData()} />
     </View>
   );
 }
