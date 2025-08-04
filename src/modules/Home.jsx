@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, LayoutAnimation } from 'react-native';
 import { load } from '../utils/storage';
 
 import HomeTitle from '../components/HomeTitle';
@@ -10,6 +10,7 @@ import SectionListCpn from '../components/SectionList';
 function Home() {
   const countRef = useRef(null);
   const [sectionData, setSectionData] = useState([]);
+  const [switchState, setSwitchState] = useState(true);
 
   const getData = async () => {
     const data = await load('accountList');
@@ -36,6 +37,8 @@ function Home() {
         data: otherList,
       },
     ];
+    // 添加页面布局动画
+    LayoutAnimation.easeInEaseOut();
     setSectionData(sectionFormatData);
   };
 
@@ -43,14 +46,25 @@ function Home() {
     getData();
   }, []);
 
-  const onClick = () => {
-    countRef.current?.show();
+  // 打开弹窗
+  const onClick = item => {
+    countRef.current?.show(item);
+  };
+
+  // Switch切换回调
+  const onSwitchChange = value => {
+    setSwitchState(value);
   };
 
   return (
     <View style={styles.root}>
-      <HomeTitle />
-      <SectionListCpn sectionData={sectionData} />
+      <HomeTitle onSwitchChange={onSwitchChange} />
+      <SectionListCpn
+        switchState={switchState}
+        sectionData={sectionData}
+        onClick={onClick}
+        refreshData={() => getData()}
+      />
       <AddButton onClick={onClick} />
       <AddAccount countRef={countRef} refreshData={() => getData()} />
     </View>

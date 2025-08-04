@@ -7,7 +7,10 @@ import {
   Text,
   TouchableOpacity,
   LayoutAnimation,
+  Alert,
 } from 'react-native';
+
+import { load, save } from '../utils/storage';
 
 import icon_game from '../assets/icon_game.png';
 import icon_platform from '../assets/icon_platform.png';
@@ -22,7 +25,7 @@ const iconMap = {
   其他: icon_other,
 };
 
-const SectionListCpn = ({ sectionData }) => {
+const SectionListCpn = ({ sectionData, onClick, refreshData, switchState }) => {
   const [sectionState, setSectionState] = useState({
     游戏: true,
     平台: true,
@@ -30,16 +33,50 @@ const SectionListCpn = ({ sectionData }) => {
     其他: true,
   });
 
+  // 打开弹框
+  const itemClick = item => {
+    onClick(item);
+  };
+
+  // 长按删除
+  const deleteAccount = async id => {
+    const data = await load('accountList');
+    const accountList = JSON.parse(data);
+    const newAccountList = accountList.filter(account => account.id !== id);
+    await save('accountList', JSON.stringify(newAccountList));
+    // 通知父重新获取数据
+    refreshData();
+  };
+
   const renderItem = ({ item, index, section }) => {
     if (!sectionState[section.type]) return;
     return (
-      <View style={styles.itemLayout}>
+      <TouchableOpacity
+        style={styles.itemLayout}
+        onPress={() => itemClick(item)}
+        onLongPress={() => {
+          Alert.alert('提示', `确定删除${item.name}账号吗？`, [
+            {
+              text: '取消',
+              style: 'cancel',
+            },
+            {
+              text: '确定',
+              onPress: () => {
+                deleteAccount(item.id);
+              },
+            },
+          ]);
+        }}
+      >
         <Text style={styles.nameTxt}>{item.name}</Text>
         <View style={styles.accpwdLayout}>
           <Text style={styles.accpwdTxt}>{`账号：${item.account}`}</Text>
-          <Text style={styles.accpwdTxt}>{`密码：${item.password}`}</Text>
+          <Text style={styles.accpwdTxt}>{`密码：${
+            switchState ? item.password : '*********'
+          }`}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -137,6 +174,7 @@ const styles = StyleSheet.create({
 
   listContainer: {
     paddingHorizontal: 12,
+    paddingBottom: 20,
   },
 
   itemLayout: {

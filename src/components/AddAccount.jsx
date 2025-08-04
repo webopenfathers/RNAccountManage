@@ -22,10 +22,27 @@ const AddModal = ({ countRef, refreshData }) => {
   const [name, setName] = useState('');
   const [account, setAccount] = useState('');
   const [password, setPassword] = useState('');
+  const [isModify, setIsModify] = useState(false);
 
-  const show = () => {
+  const show = currentAccount => {
     setVisible(true);
-    setId(getUUID());
+    // 编辑
+    if (currentAccount.type) {
+      setIsModify(true);
+      setId(currentAccount.id);
+      setType(currentAccount.type);
+      setName(currentAccount.name);
+      setAccount(currentAccount.account);
+      setPassword(currentAccount.password);
+    } else {
+      // 新增
+      setIsModify(false);
+      setId(getUUID());
+      setType('游戏');
+      setName('');
+      setAccount('');
+      setPassword('');
+    }
   };
 
   const hide = () => {
@@ -48,12 +65,13 @@ const AddModal = ({ countRef, refreshData }) => {
 
     const data = await load('accountList');
     const accountList = data ? JSON.parse(data) : [];
+
+    // 如果是编辑现有账号，则push前先移除原来的
+    const index = accountList.findIndex(item => item.id === id);
+    if (index !== -1) accountList.splice(index, 1);
+
     accountList.push(newAccount);
     await save('accountList', JSON.stringify(accountList));
-    setType('游戏');
-    setName('');
-    setAccount('');
-    setPassword('');
     hide();
     refreshData();
   };
@@ -82,7 +100,9 @@ const AddModal = ({ countRef, refreshData }) => {
     });
     return (
       <View style={styles.titleLayout}>
-        <Text style={styles.titleTxt}>添加账号</Text>
+        <Text style={styles.titleTxt}>
+          {isModify ? '修改账号' : '添加账号'}
+        </Text>
         <TouchableOpacity style={styles.closeButton} onPress={hide}>
           <Image
             style={styles.closeImg}

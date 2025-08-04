@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 const AddButton = ({ onClick }) => {
   return (
     <TouchableOpacity
-      onPress={() => onClick()}
+      onPress={onClick}
       activeOpacity={0.5}
       style={styles.addButton}
     >
