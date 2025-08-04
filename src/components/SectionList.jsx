@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   SectionList,
   View,
@@ -5,6 +6,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  LayoutAnimation,
 } from 'react-native';
 
 import icon_game from '../assets/icon_game.png';
@@ -21,8 +23,15 @@ const iconMap = {
 };
 
 const SectionListCpn = ({ sectionData }) => {
+  const [sectionState, setSectionState] = useState({
+    游戏: true,
+    平台: true,
+    银行卡: true,
+    其他: true,
+  });
+
   const renderItem = ({ item, index, section }) => {
-    console.log(item, 'item');
+    if (!sectionState[section.type]) return;
     return (
       <View style={styles.itemLayout}>
         <Text style={styles.nameTxt}>{item.name}</Text>
@@ -36,12 +45,40 @@ const SectionListCpn = ({ sectionData }) => {
 
   const renderSectionHeader = ({ section }) => {
     return (
-      <View style={styles.groupHeader}>
+      <View
+        style={[
+          styles.groupHeader,
+          {
+            borderBottomLeftRadius:
+              !section.data.length || !sectionState[section.type] ? 12 : 0,
+            borderBottomRightRadius:
+              !section.data.length || !sectionState[section.type] ? 12 : 0,
+          },
+        ]}
+      >
         <Image style={styles.typeImg} source={iconMap[section.type]} />
         <Text style={styles.typeText}>{section.type}</Text>
 
-        <TouchableOpacity style={styles.arrowContainer} onPress={() => {}}>
-          <Image style={styles.arrowImg} source={icon_arrow} />
+        <TouchableOpacity
+          style={styles.arrowContainer}
+          onPress={() => {
+            const copy = { ...sectionState };
+            copy[section.type] = !copy[section.type];
+            LayoutAnimation.easeInEaseOut();
+            setSectionState(copy);
+          }}
+        >
+          <Image
+            style={[
+              styles.arrowImg,
+              {
+                transform: [
+                  { rotate: sectionState[section.type] ? '0deg' : '-90deg' },
+                ],
+              },
+            ]}
+            source={icon_arrow}
+          />
         </TouchableOpacity>
       </View>
     );
