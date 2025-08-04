@@ -41,6 +41,7 @@ const AddModal = ({ countRef }) => {
     const newAccount = {
       id,
       type,
+      name,
       account,
       password,
     };
